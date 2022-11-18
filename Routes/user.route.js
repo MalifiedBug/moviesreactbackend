@@ -2,9 +2,14 @@ import express from "express";
 import {generateHashedPassword} from "../index.js"
 import bcrypt from 'bcrypt';
 import { insertUser, findUser } from "../Services/user.service.js";
+import jwt from 'jsonwebtoken'
+
+
 
 
 const router = express.Router();
+
+
 
 
 
@@ -38,8 +43,10 @@ router.post("/login", async function (request, response) {
         const PasswordMatch = await bcrypt.compare(password, storedPassword);
         console.log(PasswordMatch)
         if(PasswordMatch){
+          const token = jwt.sign({id: user._id},process.env.MY_SECRET)
             response.send({
-                message:"Successful Login"                
+                message:"Successful Login",
+                token: token                
             })
         }else{
             response.status(401).send({
